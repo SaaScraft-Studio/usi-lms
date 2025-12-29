@@ -4,46 +4,63 @@ import { useMemo } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-
 import {
-  FaThLarge, // Dashboard (grid-style)
-  FaVideo, // Webinar
-  FaBookOpen, // Courses
-  FaUsers, // Conference
-  FaUserGraduate, // Speakers (faculty / graduate)
-  FaUserShield, // User Status
-} from 'react-icons/fa'
+  BookOpen,
+  GraduationCap,
+  Video,
+  Brain,
+  Wrench,
+  Users,
+  UserCircle,
+  CreditCard,
+  Mic,
+} from 'lucide-react'
 
 const menuItems = [
   {
-    name: 'Dashboard',
-    href: '/dashboard',
-    icon: <FaThLarge size={20} />,
+    name: 'My Learning',
+    href: '/mylearning',
+    icon: <BookOpen size={20} />,
+  },
+  {
+    name: 'eLearning Courses',
+    href: '/elearnings',
+    icon: <GraduationCap size={20} />,
   },
   {
     name: 'Webinar',
     href: '/webinar',
-    icon: <FaVideo size={20} />,
+    icon: <Video size={20} />,
   },
   {
-    name: 'Courses',
-    href: '/courses',
-    icon: <FaBookOpen size={20} />,
+    name: 'Smart Learning Program',
+    href: '/program',
+    icon: <Brain size={20} />,
   },
   {
-    name: 'Conference',
+    name: 'Live Operative Workshop',
+    href: '/workshop',
+    icon: <Wrench size={20} />,
+  },
+  {
+    name: 'Live Conference',
     href: '/conference',
-    icon: <FaUsers size={20} />,
+    icon: <Users size={20} />,
   },
   {
     name: 'Speakers',
     href: '/speakers',
-    icon: <FaUserGraduate size={20} />,
+    icon: <Mic size={20} />,
   },
   {
-    name: 'User Status',
-    href: '/users',
-    icon: <FaUserShield size={20} />,
+    name: 'My Profile',
+    href: '/myprofile',
+    icon: <UserCircle size={20} />,
+  },
+  {
+    name: 'Payment History',
+    href: '/mypayments',
+    icon: <CreditCard size={20} />,
   },
 ]
 

@@ -164,7 +164,12 @@ export default function WebinarDetailPage() {
         <p className="text-sm text-gray-600">
           You are not registered for this webinar.
         </p>
-        <Button onClick={() => router.push('/webinar')} className='bg-orange-600 hover:bg-orange-700'>Go Back</Button>
+        <Button
+          onClick={() => router.push('/webinar')}
+          className="bg-orange-600 hover:bg-orange-700"
+        >
+          Go Back
+        </Button>
       </div>
     )
   }
@@ -237,32 +242,31 @@ export default function WebinarDetailPage() {
           </Card>
 
           <Card>
-  <CardContent className="p-4">
-    <div className="flex gap-3 border-b pb-3 font-bold overflow-x-auto whitespace-nowrap no-scrollbar">
-      {(
-        [
-          'overview',
-          'faculty',
-          'faq',
-          'feedback',
-          'quiz',
-          'meeting'
-        ] as TabType[]
-      ).map((t) => (
-        <button
-          key={t}
-          onClick={() => setTab(t)}
-          className={`shrink-0 capitalize px-3 py-1.5 rounded-md ${
-            tab === t
-              ? 'bg-[#E8F3FF] text-[#1F5C9E] font-bold'
-              : 'text-gray-600 hover:bg-gray-50 font-medium'
-          }`}
-        >
-          {t}
-        </button>
-      ))}
-    </div>
-
+            <CardContent className="p-4">
+              <div className="flex gap-3 border-b pb-3 font-bold overflow-x-auto whitespace-nowrap no-scrollbar">
+                {(
+                  [
+                    'overview',
+                    'faculty',
+                    'faq',
+                    'feedback',
+                    'quiz',
+                    'meeting',
+                  ] as TabType[]
+                ).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setTab(t)}
+                    className={`shrink-0 capitalize px-3 py-1.5 rounded-md ${
+                      tab === t
+                        ? 'bg-[#E8F3FF] text-[#1F5C9E] font-bold'
+                        : 'text-gray-600 hover:bg-gray-50 font-medium'
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
 
               <div className="mt-6">
                 {tab === 'overview' && (
@@ -280,13 +284,9 @@ export default function WebinarDetailPage() {
                 {tab === 'faq' && <FAQ webinarId={webinarId} />}
                 {tab === 'feedback' && <Feedback webinarId={webinarId} />}
                 {tab === 'quiz' && (
-                  <QuizTab
-                    webinarId={webinarId}
-                    webinarTitle={webinar.name}
-                  />
+                  <QuizTab webinarId={webinarId} webinarTitle={webinar.name} />
                 )}
                 {tab === 'meeting' && <Meeting webinarId={webinarId} />}
-
               </div>
             </CardContent>
           </Card>

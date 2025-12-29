@@ -94,7 +94,7 @@ export default function LoginForm() {
       // ✅ Store token + user (approved users only reach here)
       setUser(data.user, data.accessToken)
 
-      router.push('/dashboard')
+      router.push('/mylearning')
     } catch (error: any) {
       form.setError('identifier', {
         message: error.message || 'Unable to login',

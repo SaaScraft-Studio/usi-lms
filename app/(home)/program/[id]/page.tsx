@@ -11,8 +11,8 @@ import Overview from '@/components/Overview'
 import Faculty from '@/components/Faculty'
 import FAQ from '@/components/FAQ'
 import Feedback from '@/components/Feedback'
-import Quiz from '@/components/Quiz'
-
+import QuizTab from '@/components/QuizTab'
+import Meeting from '@/components/Meeting'
 import { apiRequest } from '@/lib/apiRequest'
 import { useAuthStore } from '@/stores/authStore'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -22,7 +22,7 @@ import WebinarSkeleton from '@/components/WebinarSkeleton'
 
 /* ================= TYPES ================= */
 
-type TabType = 'overview' | 'faculty' | 'faq' | 'feedback' | 'quiz'
+type TabType = 'overview' | 'faculty' | 'faq' | 'feedback' | 'quiz' | 'meeting'
 
 interface WebinarApi {
   _id: string
@@ -83,7 +83,6 @@ export default function ProgramDetailPage() {
         )
         console.log(typeof webinarId)
         console.log(typeof regRes.data[0].webinar._id)
-
 
         if (!registeredWebinarIds.includes(webinarId)) {
           setHasAccess(false)
@@ -169,7 +168,12 @@ export default function ProgramDetailPage() {
         <p className="text-sm text-gray-600">
           You are not registered for this program.
         </p>
-        <Button onClick={() => router.push('/program')} className='bg-orange-600 hover:bg-orange-700'>Go Back</Button>
+        <Button
+          onClick={() => router.push('/program')}
+          className="bg-orange-600 hover:bg-orange-700"
+        >
+          Go Back
+        </Button>
       </div>
     )
   }
@@ -252,6 +256,7 @@ export default function ProgramDetailPage() {
                     'faq',
                     'feedback',
                     'quiz',
+                    'meeting',
                   ] as TabType[]
                 ).map((t) => (
                   <button
@@ -283,7 +288,10 @@ export default function ProgramDetailPage() {
                 {tab === 'faculty' && <Faculty webinarId={webinarId} />}
                 {tab === 'faq' && <FAQ webinarId={webinarId} />}
                 {tab === 'feedback' && <Feedback webinarId={webinarId} />}
-                {tab === 'quiz' && <Quiz title={webinar.name} />}
+                {tab === 'quiz' && (
+                  <QuizTab webinarId={webinarId} webinarTitle={webinar.name} />
+                )}
+                {tab === 'meeting' && <Meeting webinarId={webinarId} />}
               </div>
             </CardContent>
           </Card>

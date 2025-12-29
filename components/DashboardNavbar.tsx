@@ -103,10 +103,10 @@ export default function DashboardNavbar() {
     >
       <div className="flex items-center justify-between h-16 px-4 md:px-[30px]">
         {/* ================= LEFT LOGOS ================= */}
-        <Link href="/dashboard">
+        <Link href="/mylearning">
           <div
             className="flex items-center gap-2 cursor-pointer"
-            onClick={() => router.push('/dashboard/mylearning')}
+            onClick={() => router.push('/mylearning')}
           >
             <img
               src="/urological.png"
@@ -134,7 +134,6 @@ export default function DashboardNavbar() {
 
         {/* ================= RIGHT ================= */}
         <div className="flex items-center gap-4">
-
           {/* ================= MOBILE MENU ================= */}
           <div className="md:hidden">
             <DropdownMenu>
@@ -166,8 +165,6 @@ export default function DashboardNavbar() {
                     </span>
                   </div>
                 </DropdownMenuLabel>
-
-                <DropdownMenuSeparator />
 
                 <DropdownMenuSeparator />
 

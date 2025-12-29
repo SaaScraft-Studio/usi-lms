@@ -1,107 +1,96 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
-import { Card } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { apiRequest } from '@/lib/apiRequest'
 
 /* ================= TYPES ================= */
-type FAQItem = {
-  id: string
-  q: string
-  a: string
+
+type MeetingData = {
+  _id: string
+  meetingName: string
+  meetingLink: string
 }
 
+/* ================= COMPONENT ================= */
+
 export default function Meeting({ webinarId }: { webinarId: string }) {
-  const [faq, setFaq] = useState<FAQItem[]>([])
+  const [meeting, setMeeting] = useState<MeetingData | null>(null)
   const [loading, setLoading] = useState(true)
 
-  /* ================= FETCH FAQ ================= */
+  /* ================= FETCH MEETING ================= */
+
   useEffect(() => {
     if (!webinarId) return
 
-    const fetchFAQ = async () => {
+    const fetchMeeting = async () => {
       try {
         const res = await apiRequest({
-          endpoint: `/api/webinars/${webinarId}/qna`,
+          endpoint: `/api/meetings/${webinarId}`,
           method: 'GET',
         })
 
-        const mapped: FAQItem[] =
-          res?.data?.questionsAndAnswers?.map((q: any) => ({
-            id: q._id,
-            q: q.question,
-            a: q.answer,
-          })) || []
-
-        setFaq(mapped)
+        setMeeting(res?.data ?? null)
       } catch {
-        setFaq([])
+        setMeeting(null)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchFAQ()
+    fetchMeeting()
   }, [webinarId])
 
   /* ================= LOADING ================= */
+
   if (loading) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-6 w-48" />
-        <Skeleton className="h-14 rounded-lg" />
-        <Skeleton className="h-14 rounded-lg" />
+        <Skeleton className="h-6 w-64" />
+        <Skeleton className="h-12 w-40 rounded-md" />
       </div>
     )
   }
 
   /* ================= EMPTY ================= */
-  if (!faq.length) {
+
+  if (!meeting) {
     return (
       <p className="text-muted-foreground">
-        No FAQs available for this webinar.
+        Meeting information is not available.
       </p>
     )
   }
 
   /* ================= UI ================= */
+
   return (
-    <div className="w-full max-w-full min-w-0">
-      <h2 className="text-xl md:text-2xl font-semibold mb-6">
-        Frequently Asked Questions
-      </h2>
+    <div className="w-full max-w-full">
+      <h2 className="text-xl md:text-2xl font-semibold mb-6">Live Meeting</h2>
 
-      <Card className="p-0">
-        <Accordion type="single" collapsible className="w-full divide-y">
-          {faq.map((item, index) => (
-            <AccordionItem
-              key={item.id}
-              value={`faq-${index}`}
-              className="px-4 md:px-6"
+      <Card className="max-w-xl">
+        <CardContent className="p-6 space-y-4">
+          {/* MEETING NAME */}
+          <h3 className="text-lg font-semibold break-words">
+            {meeting.meetingName}
+          </h3>
+
+          {/* JOIN BUTTON */}
+          <Button
+            asChild
+            className="bg-[#1F5C9E] hover:bg-[#184a81] text-white w-full sm:w-auto"
+          >
+            <a
+              href={meeting.meetingLink}
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              <AccordionTrigger className="text-left text-sm md:text-base font-medium hover:no-underline">
-                <div className="flex items-start gap-3">
-                  <span
-                    aria-hidden
-                    className="mt-2 inline-block w-2.5 h-2.5 rounded-full bg-[#C7D8EE] shrink-0"
-                  />
-                  <span className="flex-1">{item.q}</span>
-                </div>
-              </AccordionTrigger>
-
-              <AccordionContent className="pl-6 md:pl-8 pr-2 pb-4 text-sm text-muted-foreground leading-relaxed">
-                {item.a}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+              Join Meeting
+            </a>
+          </Button>
+        </CardContent>
       </Card>
     </div>
   )

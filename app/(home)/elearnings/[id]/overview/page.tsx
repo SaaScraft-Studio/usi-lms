@@ -10,23 +10,14 @@ import {
   PlayCircle,
   FileText,
   ImageIcon,
-  Lock,
 } from 'lucide-react'
-
 import { apiRequest } from '@/lib/apiRequest'
-import { useAuthStore } from '@/stores/authStore'
-
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-
-import CourseSkeleton from '@/components/CourseSkeleton'
-
 
 /* ================= TYPES ================= */
 
@@ -60,71 +51,100 @@ interface CourseWeek {
 /* ================= PAGE ================= */
 
 export default function ElearningDetailPage() {
-  const { id: courseId } = useParams<{ id: string }>()
+  const params = useParams<{ id: string }>()
   const router = useRouter()
-  const user = useAuthStore((s) => s.user)
+  const courseId = params.id
 
   const [course, setCourse] = useState<CourseApi | null>(null)
   const [weeks, setWeeks] = useState<CourseWeek[]>([])
   const [loading, setLoading] = useState(true)
-  const [hasAccess, setHasAccess] = useState(false)
 
-  /* ================= FETCH & GUARD ================= */
-
+  /* ================= FETCH COURSE ================= */
   useEffect(() => {
-    if (!courseId || !user?.id) return
+    if (!courseId) return
 
     const fetchData = async () => {
       try {
-        const [courseRes, weeksRes, accessRes] = await Promise.all([
-          apiRequest({ endpoint: `/api/courses/${courseId}`, method: 'GET' }),
-          apiRequest({
-            endpoint: `/api/courses/${courseId}/weeks-with-modules`,
+        const [courseRes, weeksRes] = await Promise.all([
+          apiRequest<null, any>({
+            endpoint: `/api/courses/${courseId}`,
             method: 'GET',
           }),
-          apiRequest({
-            endpoint: `/api/course/registrations/${user.id}`,
+          apiRequest<null, any>({
+            endpoint: `/api/courses/${courseId}/weeks-with-modules`,
             method: 'GET',
           }),
         ])
 
-        const registeredCourseIds = accessRes.data.map((r: any) => r.course._id)
-
-        if (!registeredCourseIds.includes(courseId)) {
-          setHasAccess(false)
-          setLoading(false)
-          return
-        }
-
-        setHasAccess(true)
         setCourse(courseRes.data)
         setWeeks(weeksRes.data || [])
       } catch (err) {
-        console.error(err)
+        console.error('Failed to fetch course detail', err)
       } finally {
         setLoading(false)
       }
     }
 
     fetchData()
-  }, [courseId, user?.id])
+  }, [courseId])
 
-  /* ================= STATES ================= */
+  /* Skeleton Loading */
 
-  if (loading) return <CourseSkeleton />
-
-  if (!hasAccess) {
+  if (loading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center gap-4">
-        <Lock className="text-red-500" size={48} />
-        <h2 className="text-xl font-semibold">Access Denied</h2>
-        <p className="text-sm text-gray-600">
-          You are not registered for this course.
-        </p>
-        <Button onClick={() => router.push('/elearnings')} className='bg-orange-600 hover:bg-orange-700'>Go Back</Button>
+      <div className="max-w-[1320px] mx-auto px-6 py-6 space-y-8 animate-pulse">
+        {/* Breadcrumb skeleton */}
+        <div className="h-4 w-64 bg-gray-200 rounded" />
+
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-6">
+          {/* LEFT */}
+          <div className="space-y-6">
+            {/* Video skeleton */}
+            <div className="aspect-video bg-gray-200 rounded-2xl" />
+
+            {/* Meta card skeleton */}
+            <div className="bg-white rounded-2xl shadow p-4 space-y-3">
+              <div className="flex justify-between">
+                <div className="h-4 w-40 bg-gray-200 rounded" />
+                <div className="h-4 w-20 bg-gray-200 rounded" />
+              </div>
+              <div className="h-4 w-32 bg-gray-200 rounded" />
+              <div className="h-5 w-3/4 bg-gray-200 rounded" />
+              <div className="h-10 w-full bg-gray-200 rounded-full mt-4" />
+            </div>
+
+            {/* Description skeleton */}
+            <div className="bg-white rounded-2xl shadow p-6 space-y-3">
+              <div className="h-5 w-40 bg-gray-200 rounded" />
+              <div className="h-4 w-full bg-gray-200 rounded" />
+              <div className="h-4 w-5/6 bg-gray-200 rounded" />
+              <div className="h-4 w-2/3 bg-gray-200 rounded" />
+            </div>
+
+            {/* Course content skeleton */}
+            <div className="bg-white rounded-2xl shadow p-6 space-y-4">
+              <div className="h-5 w-40 bg-gray-200 rounded" />
+
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="border rounded-xl px-4 py-3 space-y-2">
+                  <div className="h-4 w-32 bg-gray-200 rounded" />
+                  <div className="h-3 w-full bg-gray-100 rounded" />
+                  <div className="h-3 w-5/6 bg-gray-100 rounded" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT */}
+          <div className="bg-white rounded-2xl shadow p-6 h-fit">
+            <div className="h-3 w-32 bg-gray-200 rounded mx-auto mb-4" />
+            <div className="h-16 w-16 bg-gray-200 rounded-full mx-auto" />
+          </div>
+        </div>
       </div>
     )
   }
+
 
   if (!course) {
     return <div className="p-8 text-center">Course not found</div>
@@ -140,26 +160,29 @@ export default function ElearningDetailPage() {
         return <FileText size={18} className="text-green-600" />
       case 'photos':
         return <ImageIcon size={18} className="text-purple-600" />
+      default:
+        return null
     }
   }
 
   return (
-    <div className="max-w-[1320px] mx-auto px-4 md:px-6 py-6 space-y-6">
+    <div className="max-w-[1320px] mx-auto px-6 py-6 space-y-8">
       {/* ================= BREADCRUMB ================= */}
-      <div className="text-sm">
+      <div className="flex items-center gap-2 text-sm">
         <button
           onClick={() => router.push('/elearnings')}
-          className="text-gray-500 hover:text-blue-600"
+          className="text-gray-500 hover:text-[#1F5C9E]"
         >
           E-learning Courses
-        </button>{' '}
-        / <span className="text-blue-600">{course.courseName}</span>
+        </button>
+        <span className="text-gray-400">{'>'}</span>
+        <span className="text-[#1F5C9E] font-medium">{course.courseName}</span>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-6">
         {/* ================= LEFT ================= */}
-        <div className="space-y-6 min-w-0">
-          {/* VIDEO PLAYER */}
+        <div className="space-y-6">
+          {/* VIDEO */}
           <div className="rounded-2xl overflow-hidden aspect-video shadow">
             <iframe
               src={course.streamLink}
@@ -170,83 +193,112 @@ export default function ElearningDetailPage() {
           </div>
 
           {/* META */}
-          <Card>
-            <CardHeader>
-              <h1 className="text-lg font-semibold">{course.courseName}</h1>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
+          <div className="bg-white rounded-2xl shadow p-4 space-y-2">
+            <div className="flex justify-between text-sm text-gray-700">
               <div className="flex items-center gap-2">
                 <CalendarDays size={14} />
                 {course.startDate} - {course.endDate}
               </div>
+
               <div className="flex items-center gap-2">
-                <Clock size={14} />
-                {course.startTime} - {course.endTime}
+                <span className="w-2.5 h-2.5 rounded-full bg-green-500 border border-black" />
+                <span className="text-green-600 font-medium">
+                  {course.status}
+                </span>
               </div>
-              <Button disabled className="w-full">
-                <CheckCircle2 size={16} />
-                Registered
-              </Button>
-            </CardContent>
-          </Card>
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <Clock size={14} />
+              {course.startTime} - {course.endTime}
+            </div>
+
+            <h1 className="text-lg font-semibold text-[#252641]">
+              {course.courseName}
+            </h1>
+
+            <button
+              disabled
+              className="mt-6 w-full px-4 py-2 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center gap-2 cursor-not-allowed"
+            >
+              <CheckCircle2 size={16} />
+              Registered
+            </button>
+          </div>
 
           {/* DESCRIPTION */}
-          <Card>
-            <CardHeader>
-              <h2 className="font-semibold">About this course</h2>
-            </CardHeader>
-            <CardContent
-              className="text-sm text-gray-700"
+          <section className="bg-white rounded-2xl shadow p-6">
+            <h2 className="text-lg font-semibold mb-3">About this course</h2>
+            <div
+              className="text-sm text-gray-700 leading-relaxed"
               dangerouslySetInnerHTML={{ __html: course.description }}
             />
-          </Card>
+          </section>
 
-          {/* CONTENT */}
-          <Card>
-            <CardHeader>
-              <h2 className="font-semibold">Course Content</h2>
-            </CardHeader>
-            <CardContent>
-              <Accordion type="multiple" className="space-y-3">
-                {weeks.map((week) => (
-                  <AccordionItem key={week._id} value={week._id}>
-                    <AccordionTrigger>{week.weekCategoryName}</AccordionTrigger>
-                    <AccordionContent>
-                      {week.modules.map((m) => (
+          {/* ================= COURSE CONTENT ================= */}
+          <section className="bg-white rounded-2xl shadow p-6">
+            <h2 className="text-lg font-semibold mb-4">Course Content</h2>
+
+            <Accordion type="multiple" className="space-y-3">
+              {weeks.map((week) => (
+                <AccordionItem
+                  key={week._id}
+                  value={week._id}
+                  className="border rounded-xl px-4"
+                >
+                  <AccordionTrigger className="font-medium text-left">
+                    {week.weekCategoryName}
+                  </AccordionTrigger>
+
+                  <AccordionContent className="space-y-2 pt-2">
+                    {week.modules.length === 0 ? (
+                      <p className="text-sm text-gray-500">
+                        No modules available for this week
+                      </p>
+                    ) : (
+                      week.modules.map((module) => (
                         <div
-                          key={m._id}
-                          className="flex justify-between items-center py-2"
+                          key={module._id}
+                          className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition"
                         >
-                          <span className="flex gap-2 items-center">
-                            {getIcon(m.contentType)}
-                            {m.courseModuleName}
-                          </span>
+                          {/* LEFT */}
+                          <button
+                            onClick={() =>
+                              router.push(
+                                `/elearnings/course/${courseId}/module/${module._id}`
+                              )
+                            }
+                            className="flex items-center gap-3 text-sm font-medium text-gray-800 hover:text-[#1F5C9E]"
+                          >
+                            {getIcon(module.contentType)}
+                            {module.courseModuleName}
+                          </button>
+
+                          {/* RIGHT */}
                           <span className="text-xs text-gray-500">
-                            {m.duration}
+                            {module.duration || ''}
                           </span>
                         </div>
-                      ))}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </CardContent>
-          </Card>
+                      ))
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </section>
         </div>
 
         {/* ================= RIGHT ================= */}
-        <Card className="h-fit sticky top-6 text-center">
-          <CardContent className="p-6">
-            <p className="text-xs text-gray-500 mb-4">EDUCATIONAL GRANT BY</p>
-            <Image
-              src="/Sun_Pharma.png"
-              alt="Sun Pharma"
-              width={80}
-              height={80}
-              className="mx-auto"
-            />
-          </CardContent>
-        </Card>
+        <div className="bg-white rounded-2xl shadow p-6 h-fit sticky top-6 text-center">
+          <p className="text-xs text-gray-500 mb-4">EDUCATIONAL GRANT BY</p>
+          <Image
+            src="/Sun_Pharma.png"
+            alt="Sun Pharma"
+            width={60}
+            height={60}
+            className="mx-auto object-contain"
+          />
+        </div>
       </div>
     </div>
   )

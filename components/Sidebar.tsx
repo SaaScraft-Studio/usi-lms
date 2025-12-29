@@ -3,68 +3,69 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { useState, useEffect, memo } from 'react'
+import { useState, memo } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import {
-  FaCalendarAlt,
-  FaMapMarkerAlt,
-  FaUser,
-  FaBuilding,
-  FaUsers,
-  FaUserCheck,
-  FaTruck,
-  FaListUl,
-  FaBullhorn,
-  FaHome,
-  FaCog,
-  FaChevronCircleLeft,
-  FaChevronCircleRight,
-  FaThLarge,
-} from 'react-icons/fa'
+  BookOpen,
+  GraduationCap,
+  Video,
+  Brain,
+  Wrench,
+  Users,
+  UserCircle,
+  CreditCard,
+  Mic,
+} from 'lucide-react'
 import clsx from 'clsx'
 
 /* ================= SIDEBAR ITEMS ================= */
 
 const sidebarItems = [
   {
-    name: 'Dashboard',
-    href: '/dashboard',
-    icon: <FaThLarge size={20} />,
+    name: 'My Learning',
+    href: '/mylearning',
+    icon: <BookOpen size={20} />,
   },
-  { name: 'My Learning', href: '/mylearning', icon: <FaUsers size={20} /> },
   {
     name: 'eLearning Courses',
     href: '/elearnings',
-    icon: <FaMapMarkerAlt size={20} />,
+    icon: <GraduationCap size={20} />,
   },
-  { name: 'Webinar', href: '/webinar', icon: <FaUserCheck size={20} /> },
+  {
+    name: 'Webinar',
+    href: '/webinar',
+    icon: <Video size={20} />,
+  },
   {
     name: 'Smart Learning Program',
     href: '/program',
-    icon: <FaUser size={20} />,
+    icon: <Brain size={20} />,
   },
   {
     name: 'Live Operative Workshop',
     href: '/workshop',
-    icon: <FaBuilding size={20} />,
+    icon: <Wrench size={20} />,
   },
-
   {
     name: 'Live Conference',
     href: '/conference',
-    icon: <FaBullhorn size={20} />,
+    icon: <Users size={20} />,
   },
-  { name: 'Speakers', href: '/speakers', icon: <FaTruck size={20} /> },
+  {
+    name: 'Speakers',
+    href: '/speakers',
+    icon: <Mic size={20} />,
+  },
   {
     name: 'My Profile',
     href: '/myprofile',
-    icon: <FaBullhorn size={20} />,
+    icon: <UserCircle size={20} />,
   },
   {
     name: 'Payment History',
     href: '/mypayments',
-    icon: <FaBullhorn size={20} />,
+    icon: <CreditCard size={20} />,
   },
 ]
 
