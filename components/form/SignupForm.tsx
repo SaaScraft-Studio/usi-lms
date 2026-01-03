@@ -7,6 +7,8 @@ import { toast } from 'sonner'
 import { apiRequest } from '@/lib/apiRequest'
 import { getIndianFormattedDate } from '@/lib/formatIndianDate'
 import { countries } from '@/data/countries'
+
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -50,14 +52,10 @@ export default function SignupForm() {
     setForm((prev) => ({ ...prev, [id]: value }))
   }
 
-  /* -------------------------------------------------------------------------- */
-  /*                                 SUBMIT                                     */
-  /* -------------------------------------------------------------------------- */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
 
-    // Basic frontend validation (backend-aligned)
     if (!form.name || !form.email || !form.mobile || !form.country) {
       setError('Please fill all required fields.')
       return
@@ -87,10 +85,7 @@ export default function SignupForm() {
         description: `Submitted on ${getIndianFormattedDate()}`,
       })
 
-      // Redirect to login
-      setTimeout(() => {
-        router.push('/login')
-      }, 1000)
+      setTimeout(() => router.push('/login'), 1000)
     } catch (err: any) {
       setError(err.message || 'Signup failed')
     } finally {
@@ -99,127 +94,144 @@ export default function SignupForm() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row w-full max-w-3xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
-      {/* LEFT – FORM */}
-      <div className="w-full md:w-1/2 p-6 md:p-10 bg-orange-50">
-        <h1 className="text-xl font-semibold text-orange-700 mb-5">Sign Up</h1>
+    <Card className="p-0 w-full max-w-4xl overflow-hidden rounded-2xl shadow-xl grid md:grid-cols-[2fr_2fr]">
+      {/* ================= LEFT – FORM (60%) ================= */}
+      <div className="flex flex-col justify-between p-6 md:p-10">
+        <div>
+          <CardHeader className="px-0">
+            <CardTitle className="text-2xl text-orange-700">
+              Sign Up
+            </CardTitle>
+          </CardHeader>
 
-        <form onSubmit={handleSubmit}>
-          {/* Prefix */}
-          <Input
-            id="prefix"
-            placeholder="Prefix (Dr, Prof, Mr, Ms)"
-            value={form.prefix}
-            onChange={handleInputChange}
-            className="mb-3"
-          />
-          {/* Full Name */}
-          <Input
-            id="name"
-            placeholder="Full Name *"
-            value={form.name}
-            onChange={handleInputChange}
-            className="mb-3"
-          />
-          {/* Email */}
-          <Input
-            id="email"
-            type="email"
-            placeholder="Email *"
-            value={form.email}
-            onChange={handleInputChange}
-            className="mb-3"
-          />
-          {/* Mobile */}
-          <Input
-            id="mobile"
-            placeholder="Mobile *"
-            value={form.mobile}
-            onChange={handleInputChange}
-            className="mb-3"
-          />
-          {/* Qualification */}
-          <Input
-            id="qualification"
-            placeholder="Qualification"
-            value={form.qualification}
-            onChange={handleInputChange}
-            className="mb-3"
-          />
-          {/* Affiliation */}
-          <Input
-            id="affiliation"
-            placeholder="Affiliation"
-            value={form.affiliation}
-            onChange={handleInputChange}
-            className="mb-3"
-          />
-      
-          {/* Country */}
-          <Select
-            value={form.country}
-            onValueChange={(value) =>
-              setForm((prev) => ({ ...prev, country: value }))
-            }
-          >
-            <SelectTrigger className="w-full p-3 mb-4">
-              <SelectValue placeholder="Select Country *" />
-            </SelectTrigger>
+          <CardContent className="px-0">
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <Input
+                id="prefix"
+                placeholder="Prefix (Dr, Prof, Mr, Ms)"
+                value={form.prefix}
+                onChange={handleInputChange}
+              />
 
-            <SelectContent>
-              {countries.map((country) => (
-                <SelectItem key={country.value} value={country.value}>
-                  {country.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              <Input
+                id="name"
+                placeholder="Full Name *"
+                value={form.name}
+                onChange={handleInputChange}
+              />
 
-          {/* Terms */}
-          <div className="flex items-start gap-2 mb-4 text-sm">
-            <Checkbox
-              id="terms"
-              checked={agree}
-              onCheckedChange={(v) => setAgree(!!v)}
-            />
-            <label htmlFor="terms">
-              I agree to{' '}
-              <span className="text-orange-600">Terms & Conditions</span>
-            </label>
-          </div>
-          {/* Error */}
-          {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
-          {/* Submit */}
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-orange-600 hover:bg-orange-700"
-          >
-            {loading ? 'Signing up...' : 'Sign Up'}
-          </Button>
-          {/* Login */}
-          <p className="text-xs text-center mt-3">
-            Already have an account?{' '}
-            <span
-              onClick={() => router.push('/login')}
-              className="text-orange-600 cursor-pointer"
-            >
-              Login
-            </span>
-          </p>
-        </form>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Email *"
+                value={form.email}
+                onChange={handleInputChange}
+              />
+
+              <Input
+                id="mobile"
+                placeholder="Mobile *"
+                value={form.mobile}
+                onChange={handleInputChange}
+              />
+
+              <Input
+                id="qualification"
+                placeholder="Qualification"
+                value={form.qualification}
+                onChange={handleInputChange}
+              />
+
+              <Input
+                id="affiliation"
+                placeholder="Affiliation"
+                value={form.affiliation}
+                onChange={handleInputChange}
+              />
+
+              <Select
+                value={form.country}
+                onValueChange={(value) =>
+                  setForm((prev) => ({ ...prev, country: value }))
+                }
+              >
+                <SelectTrigger className='w-full p-3'>
+                  <SelectValue placeholder="Select Country *" />
+                </SelectTrigger>
+                <SelectContent>
+                  {countries.map((country) => (
+                    <SelectItem key={country.value} value={country.value}>
+                      {country.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <div className="flex items-start gap-2 text-sm pt-2">
+                <Checkbox
+                  id="terms"
+                  checked={agree}
+                  onCheckedChange={(v) => setAgree(!!v)}
+                />
+                <label htmlFor="terms">
+                  I agree to{' '}
+                  <span className="text-orange-600">
+                    Terms & Conditions
+                  </span>
+                </label>
+              </div>
+
+              {error && (
+                <p className="text-sm text-red-600">{error}</p>
+              )}
+
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-orange-600 hover:bg-orange-700"
+              >
+                {loading ? 'Signing up...' : 'Sign Up'}
+              </Button>
+
+              <p className="text-xs text-center pt-2">
+                Already have an account?{' '}
+                <span
+                  onClick={() => router.push('/login')}
+                  className="text-orange-600 cursor-pointer"
+                >
+                  Login
+                </span>
+              </p>
+            </form>
+          </CardContent>
+        </div>
+
+        {/* ✅ LOGO – SAME AS LOGIN */}
+        <div className="mt-6 flex flex-col items-center text-center gap-2">
+          <span className="text-sm text-gray-600">
+            Educational Grant By
+          </span>
+          <Image
+            src="/logo.png"
+            alt="USI Logo"
+            width={300}
+            height={80}
+            className="w-full max-w-[300px] object-contain"
+            priority
+          />
+        </div>
       </div>
 
-      {/* RIGHT – IMAGE */}
-      <div className="hidden md:flex w-1/2 items-center justify-center p-4 bg-white">
+      {/* ================= RIGHT – IMAGE (40%) ================= */}
+      <div className="relative hidden md:block">
         <Image
-          src="/signup.png"
+          src="/login.png"
           alt="Signup Illustration"
-          width={380}
-          height={380}
+          fill
           priority
+          className="object-fit"
         />
       </div>
-    </div>
+    </Card>
   )
 }

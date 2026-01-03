@@ -109,18 +109,11 @@ export default function SignupPage() {
       </main>
 
       {/* ================= FOOTER ================= */}
+       {/* ================= FOOTER ================= */}
       <Card className="rounded-none border-t bg-white/20 backdrop-blur-xl">
-        <CardContent className="relative py-4">
-          <div className="absolute right-4 bottom-3 flex items-center gap-2 text-sm text-gray-600">
-            <span>Educational Grant By</span>
-            <Image
-              src="/Sun_Pharma.png"
-              alt="Sun Pharma"
-              width={40}
-              height={40}
-              className="object-contain"
-              unoptimized
-            />
+        <CardContent className="py-4">
+          <div className="flex items-center justify-center text-center px-4 text-xs sm:text-sm text-gray-600">
+            Developed by SaaScraft Studio (India) Pvt. Ltd. All Rights Reserved. © 2026
           </div>
         </CardContent>
       </Card>

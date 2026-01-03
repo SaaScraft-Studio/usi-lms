@@ -243,12 +243,12 @@ export default function ElearningDetailPage() {
             EDUCATIONAL GRANT BY
           </p>
           <Image
-            src="/Sun_Pharma.png"
-            alt="Sun Pharma"
-            width={60}
-            height={60}
-            className="mx-auto"
-          />
+                        src="/logo.png"
+                        alt="Sun Pharma"
+                        width={180}
+                        height={100}
+                        className="mx-auto"
+                      />
         </div>
       </div>
     </div>

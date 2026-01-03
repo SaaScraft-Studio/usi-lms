@@ -296,12 +296,12 @@ export default function WebinarDetailPage() {
           <CardContent className="p-6">
             <p className="text-xs text-gray-500 mb-4">EDUCATIONAL GRANT BY</p>
             <Image
-              src="/Sun_Pharma.png"
-              alt="Sun Pharma"
-              width={80}
-              height={80}
-              className="mx-auto"
-            />
+                          src="/logo.png"
+                          alt="Sun Pharma"
+                          width={180}
+                          height={100}
+                          className="mx-auto"
+                        />
           </CardContent>
         </Card>
       </div>

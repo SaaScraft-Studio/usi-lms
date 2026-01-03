@@ -12,11 +12,11 @@ type Speaker = {
   name: string
   photo: string
   institute: string
-  degree:string
-  experience:string
+  specialization: string
   location: string
   videos: number
 }
+
 
 const PAGE_SIZE = 9
 
@@ -29,42 +29,65 @@ export default function SpeakersPage() {
   /* ================= FETCH ================= */
 
   useEffect(() => {
-    const fetchSpeakers = async () => {
-      try {
-        setIsFetching(true)
+  const fetchSpeakers = async () => {
+    try {
+      setIsFetching(true)
 
-        const res = await apiRequest<null, any>({
-          endpoint: '/api/assign-speakers',
-          method: 'GET',
+      const res = await apiRequest<null, any>({
+        endpoint: '/api/assign-speakers',
+        method: 'GET',
+      })
+
+      /**
+       * Map speakerId -> speaker data + unique webinarIds
+       */
+      const map = new Map<
+        string,
+        Speaker & { webinarSet: Set<string> }
+      >()
+
+      res.data.forEach((item: any) => {
+        const s = item.speakerId
+        const webinarId = item.webinarId?._id
+
+        if (!map.has(s._id)) {
+          map.set(s._id, {
+            id: s._id,
+            name: `${s.prefix} ${s.speakerName}`,
+            photo: s.speakerProfilePicture || '/avatar.png',
+            institute: s.affiliation || '—',
+            specialization: s.specialization || '—',
+            location: [s.city, s.state, s.country]
+              .filter(Boolean)
+              .join(', '),
+            videos: 0,
+            webinarSet: new Set<string>(),
+          })
+        }
+
+        // ✅ Count unique webinars per speaker
+        if (webinarId) {
+          map.get(s._id)!.webinarSet.add(webinarId)
+        }
+      })
+
+      // Final transform: calculate videos count
+      const finalSpeakers: Speaker[] = Array.from(map.values()).map(
+        ({ webinarSet, ...rest }) => ({
+          ...rest,
+          videos: webinarSet.size,
         })
+      )
 
-        // 🔥 Deduplicate speakers
-        const map = new Map<string, Speaker>()
-
-        res.data.forEach((item: any) => {
-          const s = item.speakerId
-          if (!map.has(s._id)) {
-            map.set(s._id, {
-              id: s._id,
-              name: `${s.prefix} ${s.speakerName}`,
-              photo: s.speakerProfilePicture || '/avatar.png',
-              institute: s.affiliation || '—',
-              degree: s.degree || '—',
-              experience: s.experience || '—',
-              location: [s.city, s.state, s.country].filter(Boolean).join(', '),
-              videos: 0,
-            })
-          }
-        })
-
-        setSpeakers([...map.values()])
-      } finally {
-        setIsFetching(false)
-      }
+      setSpeakers(finalSpeakers)
+    } finally {
+      setIsFetching(false)
     }
+  }
 
-    fetchSpeakers()
-  }, [])
+  fetchSpeakers()
+}, [])
+
 
   /* ================= SEARCH ================= */
 
@@ -110,7 +133,7 @@ export default function SpeakersPage() {
       </div>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {paginatedSpeakers.map((speaker) => (
           <SpeakerCard key={speaker.id} speaker={speaker} />
         ))}

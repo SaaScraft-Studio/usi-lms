@@ -283,5 +283,6 @@ export default function ModuleLecturePage() {
         </div>
       </div>
     </div>
+    
   )
 }

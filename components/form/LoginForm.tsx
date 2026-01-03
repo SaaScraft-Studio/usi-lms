@@ -40,17 +40,8 @@ type LoginValues = z.infer<typeof LoginSchema>
 /*                       IDENTIFIER → API PAYLOAD                              */
 /* -------------------------------------------------------------------------- */
 const buildLoginPayload = (identifier: string) => {
-  // Mobile (10 digits)
-  if (/^\d{10}$/.test(identifier)) {
-    return { mobile: identifier }
-  }
-
-  // Email
-  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier)) {
-    return { email: identifier }
-  }
-
-  // Membership Number
+  if (/^\d{10}$/.test(identifier)) return { mobile: identifier }
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier)) return { email: identifier }
   return { membershipNumber: identifier }
 }
 
@@ -73,14 +64,9 @@ export default function LoginForm() {
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(LoginSchema),
-    defaultValues: {
-      identifier: '',
-    },
+    defaultValues: { identifier: '' },
   })
 
-  /* -------------------------------------------------------------------------- */
-  /*                                 SUBMIT                                     */
-  /* -------------------------------------------------------------------------- */
   const onSubmit = async (values: LoginValues) => {
     try {
       const payload = buildLoginPayload(values.identifier)
@@ -91,9 +77,7 @@ export default function LoginForm() {
         body: payload,
       })
 
-      // ✅ Store token + user (approved users only reach here)
       setUser(data.user, data.accessToken)
-
       router.push('/mylearning')
     } catch (error: any) {
       form.setError('identifier', {
@@ -103,15 +87,12 @@ export default function LoginForm() {
   }
 
   return (
-    <div>
-      <Card className="w-full max-w-4xl grid md:grid-cols-2 overflow-hidden rounded-2xl shadow-xl">
-        {/* LEFT – FORM */}
-        <div className="p-6 md:p-10">
+    <Card className="p-0 w-full max-w-4xl overflow-hidden rounded-2xl shadow-xl grid md:grid-cols-[2fr_2fr]">
+      {/* ================= LEFT – FORM (60%) ================= */}
+      <div className="flex flex-col justify-between p-6 md:p-10">
+        <div>
           <CardHeader className="px-0">
             <CardTitle className="text-2xl text-orange-700">Login</CardTitle>
-            <CardDescription>
-              Login using Membership No, Email, or Mobile Number
-            </CardDescription>
           </CardHeader>
 
           <CardContent className="px-0">
@@ -125,10 +106,10 @@ export default function LoginForm() {
                   name="identifier"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Membership / Email / Mobile</FormLabel>
+                      <FormLabel>Login using Membership Number / Email / Mobile</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Enter Membership No, Email or Mobile"
+                          placeholder="Membership Number / Email / Mobile"
                           {...field}
                         />
                       </FormControl>
@@ -161,17 +142,35 @@ export default function LoginForm() {
           </CardFooter>
         </div>
 
-        {/* RIGHT – IMAGE */}
-        <div className="hidden md:flex items-center justify-center bg-white p-6">
+        {/* ✅ LOGO – NEVER OVERFLOWS 50% */}
+        <div className="mt-6 flex flex-col items-center justify-center gap-2 text-center">
+          <span className="pt-4 text-sm text-gray-600">
+            Educational Grant By
+          </span>
+
           <Image
-            src="/login.png"
-            alt="Login Illustration"
-            width={320}
-            height={320}
+            src="/logo.png"
+            alt="USI Logo"
+            width={300}
+            height={80}
+            className="w-full max-w-[300px] object-contain"
             priority
           />
         </div>
-      </Card>
-    </div>
+
+      </div>
+
+      {/* ================= RIGHT – IMAGE (40%) ================= */}
+      <div className="relative hidden md:block">
+        {/* Image fills full height of card */}
+        <Image
+          src="/login.png"
+          alt="Login Illustration"
+          fill
+          priority
+          className="object-cover"
+        />
+      </div>
+    </Card>
   )
 }

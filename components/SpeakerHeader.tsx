@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { GraduationCap, Briefcase, Star, MapPin } from 'lucide-react'
+import { GraduationCap, Briefcase, MapPin } from 'lucide-react'
 
 export type Speaker = {
   id: string
@@ -47,11 +47,6 @@ export default function SpeakerHeader({ speaker }: { speaker: Speaker }) {
             <div className="flex items-center gap-2">
               <Briefcase size={16} className="text-[#1F5C9E]" />
               <span>{speaker.designation}</span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Star size={16} className="text-[#1F5C9E]" />
-              <span>{speaker.experience}</span>
             </div>
 
             <div className="flex items-center gap-2">

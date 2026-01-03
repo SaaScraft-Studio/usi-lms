@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Skeleton } from '@/components/ui/skeleton'
-import {Card, CardContent, CardFooter} from '@/components/ui/card'
-import {Button} from '@/components/ui/button'
+import { Card, CardContent, CardFooter } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import {
   AlertDialog,
@@ -16,6 +16,9 @@ import { useAuthStore } from '@/stores/authStore'
 import { apiRequest } from '@/lib/apiRequest'
 import { toast } from 'sonner'
 import SpeakerHeader from '@/components/SpeakerHeader'
+import { CalendarDays, Clock } from 'lucide-react'
+import StatusBadge from '@/components/StatusBadge'
+import CountdownTimer from '@/components/CountdownTimer'
 
 // Route Helper
 const WEBINAR_ROUTE_MAP: Record<string, string> = {
@@ -59,9 +62,8 @@ export default function SpeakerDetailsPage() {
         setSpeaker({
           name: `${s.prefix} ${s.speakerName}`,
           photo: s.speakerProfilePicture,
-          qualification: s.degree,
+          qualification: s.affiliation,
           designation: s.specialization,
-          experience: s.experience,
           location: [s.city, s.state, s.country].filter(Boolean).join(', '),
         })
 
@@ -167,37 +169,67 @@ export default function SpeakerDetailsPage() {
           <SpeakerHeader speaker={speaker} />
         </div>
 
-        {/* Sponsor (desktop only here) */}
-        <Card className="hidden lg:flex self-start">
-          <CardContent className="p-4 text-center">
-            <p className="text-xs text-gray-500 mb-3">EDUCATIONAL GRANT BY</p>
-            <Image
-              src="/Sun_Pharma.png"
-              alt="Sun Pharma"
-              width={90}
-              height={90}
-              className="mx-auto object-contain"
-            />
-          </CardContent>
-        </Card>
+
+        {/* RIGHT */}
+        <div className="bg-white rounded-xl shadow p-6 h-fit sticky top-6 text-center">
+          <p className="text-xs text-gray-500 mb-4">
+            EDUCATIONAL GRANT BY
+          </p>
+          <Image
+            src="/logo.png"
+            alt="Sponsor Image"
+            width={180}
+            height={100}
+            className="mx-auto"
+          />
+        </div>
       </div>
 
       {/* WEBINAR LIST */}
-      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {webinars.map((w) => (
           <Card
             key={w._id}
             className="p-0 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col"
           >
             {/* IMAGE */}
-            <div className="relative h-44">
-              <Image src={w.image} alt={w.name} fill className="object-cover" />
-            </div>
+           <div className="relative h-[250px] w-full overflow-hidden">
+                         <Image
+                           src={w.image}
+                           alt={w.name}
+                           fill
+                           className="object-fit transition-transform duration-500 group-hover:scale-110"
+                         />
+                       </div>
+                       
 
             {/* CONTENT */}
-            <CardContent className="p-4 flex-1">
-              <p className="text-sm font-semibold line-clamp-2">{w.name}</p>
-            </CardContent>
+            <CardContent className="flex flex-col flex-grow">
+                          <StatusBadge status={w.dynamicStatus} />
+            
+            
+                          <h3 className="font-semibold text-sm line-clamp-2">
+                            {w.name}
+                          </h3>
+            
+                          {w.dynamicStatus === 'Upcoming' && (
+                            <CountdownTimer
+                              startDate={w.startDate}
+                              startTime={w.startTime}
+                            />
+                          )}
+            
+                          <div className="mt-3 text-xs text-gray-600 space-y-2">
+                            <div className="flex items-center gap-2">
+                              <CalendarDays size={14} />
+                              {w.startDate} – {w.endDate}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Clock size={14} />
+                              {w.startTime} – {w.endTime}
+                            </div>
+                          </div>
+                        </CardContent>
 
             {/* FOOTER / CTA */}
             <CardFooter className="p-4 pt-0">
@@ -218,11 +250,10 @@ export default function SpeakerDetailsPage() {
                     setSelectedWebinar(w)
                     setDialogOpen(true)
                   }}
-                  className={`w-full text-xs ${
-                    w.registrationType === 'free'
+                  className={`w-full text-xs ${w.registrationType === 'free'
                       ? 'bg-green-600 hover:bg-green-700'
                       : 'bg-orange-500 hover:bg-orange-600'
-                  }`}
+                    }`}
                 >
                   {w.registrationType === 'free'
                     ? 'Register Free'
@@ -235,44 +266,44 @@ export default function SpeakerDetailsPage() {
       </div>
 
       {/* REGISTER DIALOG */}
-            <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <AlertDialogContent>
-                {selectedWebinar?.registrationType === 'paid' ? (
-                  <div className="space-y-4 text-center">
-                    <h2 className="text-lg font-semibold">
-                      Payment integration coming soon
-                    </h2>
-                    <AlertDialogCancel disabled={submitting}>Close</AlertDialogCancel>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <h2 className="text-center text-lg font-semibold text-blue-600">
-                      Register for FREE
-                    </h2>
-      
-                    <input
-                      value={identifier}
-                      onChange={(e) => setIdentifier(e.target.value)}
-                      disabled={submitting}
-                      placeholder="USI No | Email | Mobile"
-                      className="w-full border rounded px-4 py-2"
-                    />
-      
-                    <Button
-                      onClick={handleRegister}
-                      disabled={submitting}
-                      className="w-full bg-[#1F5C9E]"
-                    >
-                      {submitting ? 'Submitting...' : 'Submit'}
-                    </Button>
-      
-                    <AlertDialogCancel disabled={submitting}>
-                      Cancel
-                    </AlertDialogCancel>
-                  </div>
-                )}
-              </AlertDialogContent>
-            </AlertDialog>
+      <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <AlertDialogContent>
+          {selectedWebinar?.registrationType === 'paid' ? (
+            <div className="space-y-4 text-center">
+              <h2 className="text-lg font-semibold">
+                Payment integration coming soon
+              </h2>
+              <AlertDialogCancel disabled={submitting}>Close</AlertDialogCancel>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <h2 className="text-center text-lg font-semibold text-blue-600">
+                Register for FREE
+              </h2>
+
+              <input
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                disabled={submitting}
+                placeholder="USI No | Email | Mobile"
+                className="w-full border rounded px-4 py-2"
+              />
+
+              <Button
+                onClick={handleRegister}
+                disabled={submitting}
+                className="w-full bg-[#1F5C9E]"
+              >
+                {submitting ? 'Submitting...' : 'Submit'}
+              </Button>
+
+              <AlertDialogCancel disabled={submitting}>
+                Cancel
+              </AlertDialogCancel>
+            </div>
+          )}
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
