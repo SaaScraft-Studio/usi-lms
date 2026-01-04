@@ -92,7 +92,7 @@ export default function LoginForm() {
       <div className="flex flex-col justify-between p-6 md:p-10">
         <div>
           <CardHeader className="px-0">
-            <CardTitle className="text-2xl text-orange-700">Login</CardTitle>
+            <CardTitle className="text-2xl text-bold text-orange-700 hover:text-orange-800">Login</CardTitle>
           </CardHeader>
 
           <CardContent className="px-0">

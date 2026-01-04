@@ -210,11 +210,10 @@ export default function WebinarList() {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`pb-1 text-sm font-medium ${
-              tab === t
+            className={`pb-1 text-sm font-medium ${tab === t
                 ? 'text-[#1F5C9E] border-b-2 border-[#1F5C9E]'
                 : 'text-gray-500 hover:text-[#1F5C9E]'
-            }`}
+              }`}
           >
             {t}
           </button>
@@ -261,7 +260,7 @@ export default function WebinarList() {
             </div>
 
             <CardContent className="flex flex-col flex-grow">
-             <StatusBadge status={w.dynamicStatus} />
+              <StatusBadge status={w.dynamicStatus} />
 
 
               <h3 className="font-semibold text-sm line-clamp-2">
@@ -288,11 +287,7 @@ export default function WebinarList() {
             </CardContent>
 
             <CardFooter className="p-4 pt-0">
-              {w.dynamicStatus === 'Past' ? (
-                <Button disabled className="w-full">
-                  Registration Closed
-                </Button>
-              ) : registeredIds.includes(w._id) ? (
+              {registeredIds.includes(w._id) ? (
                 <Link href={`/webinar/${w._id}`} className="w-full">
                   <Button className="w-full bg-blue-600 hover:bg-blue-700">
                     View Details
@@ -304,11 +299,10 @@ export default function WebinarList() {
                     setSelectedWebinar(w)
                     setDialogOpen(true)
                   }}
-                  className={`w-full ${
-                    w.registrationType === 'free'
+                  className={`w-full ${w.registrationType === 'free'
                       ? 'bg-green-600 hover:bg-green-700'
                       : 'bg-orange-500 hover:bg-orange-600'
-                  }`}
+                    }`}
                 >
                   {w.registrationType === 'free'
                     ? 'Register Free'
@@ -316,6 +310,7 @@ export default function WebinarList() {
                 </Button>
               )}
             </CardFooter>
+
           </Card>
         ))}
       </div>

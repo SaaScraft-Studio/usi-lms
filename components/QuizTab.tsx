@@ -87,7 +87,7 @@ export default function QuizTab({
               onClick={() => setActiveIndex(idx)}
               className={`shrink-0 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 idx === activeIndex
-                  ? 'bg-[#1F5C9E] text-white'
+                  ? 'bg-orange-600 hover:bg-orange-700 rounded-xl text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >

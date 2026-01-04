@@ -288,34 +288,31 @@ export default function ProgramPage() {
             </CardContent>
 
             <CardFooter className="p-4 pt-0">
-              {w.dynamicStatus === 'Past' ? (
-                <Button disabled className="w-full">
-                  Registration Closed
-                </Button>
-              ) : registeredIds.includes(w._id) ? (
-                <Link href={`/program/${w._id}`} className="w-full">
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                    View Details
-                  </Button>
-                </Link>
-              ) : (
-                <Button
-                  onClick={() => {
-                    setSelectedWebinar(w)
-                    setDialogOpen(true)
-                  }}
-                  className={`w-full ${
-                    w.registrationType === 'free'
-                      ? 'bg-green-600 hover:bg-green-700'
-                      : 'bg-orange-500 hover:bg-orange-600'
-                  }`}
-                >
-                  {w.registrationType === 'free'
-                    ? 'Register Free'
-                    : `₹${w.amount} | Register`}
-                </Button>
-              )}
-            </CardFooter>
+  {registeredIds.includes(w._id) ? (
+    <Link href={`/program/${w._id}`} className="w-full">
+      <Button className="w-full bg-blue-600 hover:bg-blue-700">
+        View Details
+      </Button>
+    </Link>
+  ) : (
+    <Button
+      onClick={() => {
+        setSelectedWebinar(w)
+        setDialogOpen(true)
+      }}
+      className={`w-full ${
+        w.registrationType === 'free'
+          ? 'bg-green-600 hover:bg-green-700'
+          : 'bg-orange-500 hover:bg-orange-600'
+      }`}
+    >
+      {w.registrationType === 'free'
+        ? 'Register Free'
+        : `₹${w.amount} | Register`}
+    </Button>
+  )}
+</CardFooter>
+
           </Card>
         ))}
       </div>

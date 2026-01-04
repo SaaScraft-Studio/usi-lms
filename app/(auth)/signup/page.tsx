@@ -108,12 +108,11 @@ export default function SignupPage() {
         <SignupForm />
       </main>
 
-      {/* ================= FOOTER ================= */}
        {/* ================= FOOTER ================= */}
       <Card className="rounded-none border-t bg-white/20 backdrop-blur-xl">
         <CardContent className="py-4">
           <div className="flex items-center justify-center text-center px-4 text-xs sm:text-sm text-gray-600">
-            Developed by SaaScraft Studio (India) Pvt. Ltd. All Rights Reserved. © 2026
+            © Urological Society of India. All Rights Reserved. Learning Management System by SaaScraft Studio (India) Pvt. Ltd.
           </div>
         </CardContent>
       </Card>

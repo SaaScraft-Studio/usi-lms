@@ -166,17 +166,17 @@ export default function Overview({
                 <button
                   type="button"
                   onClick={() => setCommentText('')}
-                  className="px-3 py-1.5 border rounded text-sm"
+                  className="px-3 py-1.5 border rounded-xl text-sm hover:bg-gray-50"
                   disabled={posting}
                 >
-                  Cancel
+                  Clear
                 </button>
 
                 <Button
                   type="button"
                   onClick={onAddComment}
                   disabled={posting}
-                  className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm"
+                  className="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-xl text-sm"
                 >
                   {posting ? 'Posting...' : 'Comment'}
                 </Button>

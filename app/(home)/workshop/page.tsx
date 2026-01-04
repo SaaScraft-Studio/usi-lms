@@ -210,11 +210,10 @@ export default function WorkshopPage() {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`pb-1 text-sm font-medium ${
-              tab === t
+            className={`pb-1 text-sm font-medium ${tab === t
                 ? 'text-[#1F5C9E] border-b-2 border-[#1F5C9E]'
                 : 'text-gray-500 hover:text-[#1F5C9E]'
-            }`}
+              }`}
           >
             {t}
           </button>
@@ -287,11 +286,7 @@ export default function WorkshopPage() {
             </CardContent>
 
             <CardFooter className="p-4 pt-0">
-              {w.dynamicStatus === 'Past' ? (
-                <Button disabled className="w-full">
-                  Registration Closed
-                </Button>
-              ) : registeredIds.includes(w._id) ? (
+              {registeredIds.includes(w._id) ? (
                 <Link href={`/workshop/${w._id}`} className="w-full">
                   <Button className="w-full bg-blue-600 hover:bg-blue-700">
                     View Details
@@ -303,11 +298,10 @@ export default function WorkshopPage() {
                     setSelectedWebinar(w)
                     setDialogOpen(true)
                   }}
-                  className={`w-full ${
-                    w.registrationType === 'free'
+                  className={`w-full ${w.registrationType === 'free'
                       ? 'bg-green-600 hover:bg-green-700'
                       : 'bg-orange-500 hover:bg-orange-600'
-                  }`}
+                    }`}
                 >
                   {w.registrationType === 'free'
                     ? 'Register Free'
@@ -315,6 +309,7 @@ export default function WorkshopPage() {
                 </Button>
               )}
             </CardFooter>
+
           </Card>
         ))}
       </div>

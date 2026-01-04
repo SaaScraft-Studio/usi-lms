@@ -80,7 +80,7 @@ export default function Meeting({ webinarId }: { webinarId: string }) {
           {/* JOIN BUTTON */}
           <Button
             asChild
-            className="bg-[#1F5C9E] hover:bg-[#184a81] text-white w-full sm:w-auto"
+            className="bg-orange-600 hover:bg-orange-700 text-white w-full sm:w-auto"
           >
             <a
               href={meeting.meetingLink}

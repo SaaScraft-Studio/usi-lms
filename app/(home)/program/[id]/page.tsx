@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { JSX, useEffect, useMemo, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import DOMPurify from 'dompurify'
-import { CalendarDays, Clock, CheckCircle, Lock } from 'lucide-react'
+import { CalendarDays, Clock, CheckCircle, Lock, MessageSquarePlus } from 'lucide-react'
 import { toast } from 'sonner'
 
 import Overview from '@/components/Overview'
@@ -13,16 +13,18 @@ import FAQ from '@/components/FAQ'
 import Feedback from '@/components/Feedback'
 import QuizTab from '@/components/QuizTab'
 import Meeting from '@/components/Meeting'
+
 import { apiRequest } from '@/lib/apiRequest'
 import { useAuthStore } from '@/stores/authStore'
+
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-
 import WebinarSkeleton from '@/components/WebinarSkeleton'
+import AskQuestion from '@/components/AskQuestion'
 
 /* ================= TYPES ================= */
 
-type TabType = 'overview' | 'faculty' | 'faq' | 'feedback' | 'quiz' | 'meeting'
+type TabType = 'overview' | 'faculty' | 'faq' | 'feedback' | 'quiz' | 'meeting' | 'question'
 
 interface WebinarApi {
   _id: string
@@ -46,7 +48,7 @@ type Comment = {
 
 /* ================= PAGE ================= */
 
-export default function ProgramDetailPage() {
+export default function WebinarDetailPage() {
   const router = useRouter()
   const { id: webinarId } = useParams<{ id: string }>()
   const user = useAuthStore((s) => s.user)
@@ -60,7 +62,16 @@ export default function ProgramDetailPage() {
   const [commentText, setCommentText] = useState('')
   const [posting, setPosting] = useState(false)
 
-  /* ================= FETCH + GUARD ================= */
+  const [settings, setSettings] = useState<{
+    faculty: boolean
+    faq: boolean
+    feedback: boolean
+    quiz: boolean
+    meeting: boolean
+    question: boolean
+  } | null>(null)
+
+  /* ================= FETCH WEBINAR + ACCESS ================= */
 
   useEffect(() => {
     if (!webinarId || !user?.id) return
@@ -78,15 +89,10 @@ export default function ProgramDetailPage() {
           }),
         ])
 
-        const registeredWebinarIds = regRes.data.map((r: any) =>
-          String(r.webinar._id)
-        )
-        console.log(typeof webinarId)
-        console.log(typeof regRes.data[0].webinar._id)
+        const registeredIds = regRes.data.map((r: any) => r.webinar._id)
 
-        if (!registeredWebinarIds.includes(webinarId)) {
+        if (!registeredIds.includes(webinarId)) {
           setHasAccess(false)
-          setLoading(false)
           return
         }
 
@@ -102,31 +108,65 @@ export default function ProgramDetailPage() {
     fetchData()
   }, [webinarId, user?.id])
 
-  /* ================= COMMENTS ================= */
-
-  const fetchComments = async () => {
-    try {
-      const res = await apiRequest({
-        endpoint: `/api/webinars/${webinarId}/comments`,
-        method: 'GET',
-      })
-
-      const mapped: Comment[] = res.data.map((c: any) => ({
-        id: c._id,
-        author: c.userId?.name || 'Anonymous',
-        profile: c.userId?.profilePicture,
-        text: c.comment,
-        date: c.createdAt,
-      }))
-
-      setComments(mapped)
-    } catch {
-      setComments([])
-    }
-  }
+  /* ================= FETCH SETTINGS ================= */
 
   useEffect(() => {
-    if (webinarId && hasAccess) fetchComments()
+    if (!webinarId || !hasAccess) return
+
+    const fetchSettings = async () => {
+      try {
+        const res = await apiRequest({
+          endpoint: `/api/webinars/${webinarId}/settings`,
+          method: 'GET',
+        })
+
+        if (res?.data) {
+          setSettings({
+            faculty: !!res.data.faculty,
+            faq: !!res.data.faq,
+            feedback: !!res.data.feedback,
+            quiz: !!res.data.quiz,
+            meeting: !!res.data.meeting,
+            question: !!res.data.question,
+          })
+        } else {
+          setSettings(null)
+        }
+      } catch {
+        setSettings(null)
+      }
+    }
+
+    fetchSettings()
+  }, [webinarId, hasAccess])
+
+  /* ================= COMMENTS ================= */
+
+  useEffect(() => {
+    if (!webinarId || !hasAccess) return
+
+    const fetchComments = async () => {
+      try {
+        const res = await apiRequest({
+          endpoint: `/api/webinars/${webinarId}/comments`,
+          method: 'GET',
+        })
+
+        const mapped: Comment[] = res.data.map((c: any) => ({
+          id: c._id,
+          author: c.userId?.name || 'Anonymous',
+          profile: c.userId?.profilePicture,
+          text: c.comment,
+          date: c.createdAt,
+        }))
+
+        setComments(mapped)
+      } catch {
+        setComments([])
+      }
+    }
+
+    fetchComments()
   }, [webinarId, hasAccess])
 
   /* ================= ADD COMMENT ================= */
@@ -148,13 +188,59 @@ export default function ProgramDetailPage() {
 
       toast.success('Comment added')
       setCommentText('')
-      fetchComments()
     } catch (err: any) {
       toast.error(err.message || 'Failed to add comment')
     } finally {
       setPosting(false)
     }
   }
+
+  /* ================= AVAILABLE TABS (MEMOIZED) ================= */
+
+  const availableTabs = useMemo<TabType[]>(() => {
+    return [
+      'overview',
+      ...(settings?.faculty ? (['faculty'] as TabType[]) : []),
+      ...(settings?.faq ? (['faq'] as TabType[]) : []),
+      ...(settings?.feedback ? (['feedback'] as TabType[]) : []),
+      ...(settings?.quiz ? (['quiz'] as TabType[]) : []),
+      ...(settings?.meeting ? (['meeting'] as TabType[]) : []),
+      ...(settings?.question ? (['question'] as TabType[]) : []),
+    ]
+  }, [settings])
+
+  /* ================= TAB SAFETY ================= */
+
+  useEffect(() => {
+    if (!availableTabs.includes(tab)) {
+      setTab('overview')
+    }
+  }, [availableTabs, tab])
+
+  /* ================= TAB PANELS (MEMOIZED) ================= */
+
+  const tabPanels = useMemo(() => {
+    if (!webinar) return null
+
+    return {
+      overview: (
+        <Overview
+          description={DOMPurify.sanitize(webinar.description)}
+          comments={comments}
+          commentText={commentText}
+          setCommentText={setCommentText}
+          onAddComment={handleAddComment}
+          posting={posting}
+        />
+      ),
+      faculty: <Faculty webinarId={webinarId} />,
+      faq: <FAQ webinarId={webinarId} />,
+      feedback: <Feedback webinarId={webinarId} />,
+      quiz: <QuizTab webinarId={webinarId} webinarTitle={webinar.name} />,
+      meeting: <Meeting webinarId={webinarId} />,
+      question: <AskQuestion webinarId={webinarId} />,
+    } as Record<TabType, JSX.Element>
+  }, [webinar, comments, commentText, posting, webinarId])
 
   /* ================= STATES ================= */
 
@@ -179,7 +265,7 @@ export default function ProgramDetailPage() {
   }
 
   if (!webinar) {
-    return <div className="p-8 text-center">program not found</div>
+    return <div className="p-8 text-center">Program not found</div>
   }
 
   /* ================= UI ================= */
@@ -248,65 +334,62 @@ export default function ProgramDetailPage() {
           {/* TABS */}
           <Card>
             <CardContent className="p-4">
-              <div className="flex gap-3 border-b pb-3 overflow-x-auto whitespace-nowrap no-scrollbar">
-                {(
-                  [
-                    'overview',
-                    'faculty',
-                    'faq',
-                    'feedback',
-                    'quiz',
-                    'meeting',
-                  ] as TabType[]
-                ).map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setTab(t)}
-                    className={`shrink-0 capitalize px-3 py-1.5 rounded-md text-sm ${
-                      tab === t
-                        ? 'bg-[#E8F3FF] text-[#1F5C9E] font-semibold'
-                        : 'text-gray-600 hover:bg-gray-50'
-                    }`}
-                  >
-                    {t}
-                  </button>
-                ))}
+              <div className="flex gap-3 border-b pb-3 font-bold overflow-x-auto whitespace-nowrap no-scrollbar">
+                {availableTabs.map((t) => {
+                  const isActive = tab === t
+
+                  // 🔹 Special UI for Question tab
+                  if (t === 'question') {
+                    return (
+                      <button
+                        key={t}
+                        onClick={() => setTab(t)}
+                        className={`shrink-0 flex items-center gap-2 px-4 py-1.5 rounded-full border text-sm font-medium transition
+          ${isActive
+                            ? 'bg-orange-600 hover:bg-orange-700 text-white border-orange-100'
+                            : 'bg-white text-orange-600 border-orange-600 hover:bg-orange-50'
+                          }
+        `}
+                      >
+                        <MessageSquarePlus size={16} />
+                        Ask Question
+                      </button>
+                    )
+                  }
+
+                  // 🔹 Normal tabs
+                  return (
+                    <button
+                      key={t}
+                      onClick={() => setTab(t)}
+                      className={`shrink-0 capitalize px-3 py-1.5 rounded-md ${isActive
+                          ? 'bg-[#E8F3FF] text-orange-600 font-bold'
+                          : 'text-gray-600 hover:bg-gray-50 font-medium'
+                        }`}
+                    >
+                      {t}
+                    </button>
+                  )
+                })}
+
               </div>
 
-              <div className="mt-6">
-                {tab === 'overview' && (
-                  <Overview
-                    description={DOMPurify.sanitize(webinar.description)}
-                    comments={comments}
-                    commentText={commentText}
-                    setCommentText={setCommentText}
-                    onAddComment={handleAddComment}
-                    posting={posting}
-                  />
-                )}
-
-                {tab === 'faculty' && <Faculty webinarId={webinarId} />}
-                {tab === 'faq' && <FAQ webinarId={webinarId} />}
-                {tab === 'feedback' && <Feedback webinarId={webinarId} />}
-                {tab === 'quiz' && (
-                  <QuizTab webinarId={webinarId} webinarTitle={webinar.name} />
-                )}
-                {tab === 'meeting' && <Meeting webinarId={webinarId} />}
-              </div>
+              <div className="mt-6">{tabPanels?.[tab]}</div>
             </CardContent>
           </Card>
         </div>
-        {/* ================= RIGHT ================= */}
+
+        {/* RIGHT */}
         <Card className="h-fit sticky top-6 text-center">
           <CardContent className="p-6">
             <p className="text-xs text-gray-500 mb-4">EDUCATIONAL GRANT BY</p>
             <Image
-                          src="/logo.png"
-                          alt="Sun Pharma"
-                          width={180}
-                          height={100}
-                          className="mx-auto"
-                        />
+              src="/logo.png"
+              alt="Sponsor"
+              width={180}
+              height={100}
+              className="mx-auto"
+            />
           </CardContent>
         </Card>
       </div>
