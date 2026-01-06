@@ -21,6 +21,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import WebinarSkeleton from '@/components/WebinarSkeleton'
 import AskQuestion from '@/components/AskQuestion'
+import SponsorCard from '@/components/SponsorCard'
 
 /* ================= TYPES ================= */
 
@@ -380,18 +381,7 @@ export default function WebinarDetailPage() {
         </div>
 
         {/* RIGHT */}
-        <Card className="h-fit sticky top-6 text-center">
-          <CardContent className="p-6">
-            <p className="text-xs text-gray-500 mb-4">EDUCATIONAL GRANT BY</p>
-            <Image
-              src="/logo.png"
-              alt="Sponsor"
-              width={180}
-              height={100}
-              className="mx-auto"
-            />
-          </CardContent>
-        </Card>
+        <SponsorCard/>
       </div>
     </div>
   )

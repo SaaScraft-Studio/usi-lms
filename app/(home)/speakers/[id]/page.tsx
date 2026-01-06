@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -19,6 +19,7 @@ import SpeakerHeader from '@/components/SpeakerHeader'
 import { CalendarDays, Clock } from 'lucide-react'
 import StatusBadge from '@/components/StatusBadge'
 import CountdownTimer from '@/components/CountdownTimer'
+import SponsorCard from '@/components/SponsorCard'
 
 // Route Helper
 const WEBINAR_ROUTE_MAP: Record<string, string> = {
@@ -166,23 +167,13 @@ export default function SpeakerDetailsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-[70%_30%] gap-6">
         {/* Speaker Header */}
         <div>
-          <SpeakerHeader speaker={speaker} />
+          <SpeakerHeader key={speaker.id} speaker={speaker} />
         </div>
 
 
-        {/* RIGHT */}
-        <div className="bg-white rounded-xl shadow p-6 h-fit sticky top-6 text-center">
-          <p className="text-xs text-gray-500 mb-4">
-            EDUCATIONAL GRANT BY
-          </p>
-          <Image
-            src="/logo.png"
-            alt="Sponsor Image"
-            width={180}
-            height={100}
-            className="mx-auto"
-          />
-        </div>
+       {/* RIGHT: PREMIUM SPONSOR */}
+        <SponsorCard/>
+
       </div>
 
       {/* WEBINAR LIST */}
@@ -190,7 +181,7 @@ export default function SpeakerDetailsPage() {
         {webinars.map((w) => (
           <Card
             key={w._id}
-            className="p-0 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col"
+            className="p-0 group rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition hover:-translate-y-1 flex flex-col"
           >
             {/* IMAGE */}
             <div className="relative h-[250px] w-full overflow-hidden">

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { CalendarDays, Clock, Clock3 } from 'lucide-react'
+import { CalendarDays, Clock} from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogContent,

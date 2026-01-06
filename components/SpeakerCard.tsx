@@ -10,7 +10,6 @@ export type SpeakerCardItem = {
   name: string
   photo: string
   institute: string
-  specialization: string
   location: string
   videos: number
 }
@@ -63,10 +62,6 @@ export default function SpeakerCard({ speaker }: { speaker: SpeakerCardItem }) {
           <div className="flex items-center gap-2">
             <Building size={14} />
             <span className="line-clamp-1">{speaker.institute || '—'}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Building size={14} />
-            <span className="line-clamp-1">{speaker.specialization || '—'}</span>
           </div>
 
           <div className="flex items-center gap-2">

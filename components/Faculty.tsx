@@ -12,11 +12,12 @@ import {
 } from 'lucide-react'
 import { apiRequest } from '@/lib/apiRequest'
 import { Skeleton } from '@/components/ui/skeleton'
+import Link from 'next/link'
 
 /* ================= TYPES ================= */
 type FacultyItem = {
   id: string
-  role: 'convenor' | 'co-convenor' | 'faculty'
+  role: 'convenor' | 'co-convenor' | 'faculty' 
   name: string
   title?: string
   institution?: string
@@ -101,8 +102,9 @@ export default function Faculty({ webinarId }: { webinarId: string }) {
 
         {/* Info */}
         <div className="space-y-1">
+          <Link href={`/speakers/${f.id}`}>
           <h3 className="text-[#1F5C9E] font-semibold">{f.name}</h3>
-
+          </Link>
           {f.title && (
             <div className="flex items-center gap-2 text-sm">
               <Briefcase size={14} />
